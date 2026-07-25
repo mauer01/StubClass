@@ -183,6 +183,12 @@ export class StubFullType<T> implements Stubbed<T> {
     if (nextOutput instanceof Error) throw nextOutput;
     return nextOutput;
   }
+
+  /**
+   * returns the next output for the stubbed method or the first output if the method is marked permanent
+   * @param key
+   * @private
+   */
   private nextOutput(
     key: keyof T,
   ): unknown {
@@ -191,16 +197,32 @@ export class StubFullType<T> implements Stubbed<T> {
       : this._stub[key].outputs.shift();
   }
 
+  /**
+   * increments the counter for the stubbed method
+   * @param key
+   * @private
+   */
   private incrementCounter(key: keyof T) {
     this._stub[key].counter = (this._stub[key].counter) + 1;
   }
 
+  /**
+   * saves the arguments used on the stubbed method
+   * @param args
+   * @param method
+   * @private
+   */
   private saveArgs(
     args: unknown[],
     method: keyof T,
   ) {
     this._stub[method].args.push(args);
   }
+
+  /**
+   * creates a clean catalog
+   * @private
+   */
   private createInitialState<K extends MethodKeys<T>>(): Stub<T>[K] {
     return {
       counter: 0,

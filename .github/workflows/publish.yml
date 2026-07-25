@@ -1,5 +1,6 @@
 name: Publish
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -12,5 +13,7 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v6
+      - name: setup deno
+        uses: denoland/setup-deno@v2
       - name: Publish package
-        run: npx jsr publish
+        run: deno publish
