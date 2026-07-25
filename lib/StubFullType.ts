@@ -4,6 +4,30 @@ import type { Stubbed } from "./types/Stubbed.ts";
 import type { MethodKeys } from "./types/MethodKeys.ts";
 import type { AnyFunctions } from "./types/AnyFunctions.ts";
 
+/**
+ * Provides a full stub implementation for a given type.
+ * It allows for overriding methods with custom functions and interacting with the stub catalog.
+ *
+ * 2 Primary Usage Patterns
+ * 1. No Attributes
+ * ```ts
+ *    type A = {methodA: ()=>void}
+ *    const stubA = new StubFullType<A>(["methodA"]), stubAToo = StubFullType.create<A>(["methodA"])
+ * ```
+ * 2. Attributes
+ * ```ts
+ *    type A = {methodA: ()=>void}
+ *    type B = {b: A, methodB: ()=>void}
+ *    class StubbedB extends StubFullType<B> {
+ *      b: Stubbed<A>;
+ *      constructor() {
+ *        super(["methodB"]);
+ *        this.b = StubFullType.create<A>(["methodA"]);
+ *      }
+ *    }
+ *    const stubB = new StubbedB()
+ * ```
+ */
 export class StubFullType<T> implements Stubbed<T> {
   /**
    * Returns a shallow copy of the stub catalog.
@@ -106,12 +130,6 @@ export class StubFullType<T> implements Stubbed<T> {
    * @param _methodNames - Array of method keys to initialize stubs for.
    * @param _stub - Initial stub state, defaulting to an empty stub.
    */
-  protected constructor(
-    private readonly _methodNames: (MethodKeys<T>)[] = [],
-    private readonly _stub: Stub<T> = {} as Stub<T>,
-  ) {
-    this._methodNames.forEach((e) => this.initializeStub(e));
-  }
   /**
    * Static factory method for creating an instance of `StubFullType`.
    *
@@ -125,6 +143,12 @@ export class StubFullType<T> implements Stubbed<T> {
     methodNames?: (keyof FilterAndMapMethodsToUnknown<T>)[],
   ): Stubbed<T> {
     return new StubFullType(methodNames);
+  }
+  protected constructor(
+    private readonly _methodNames: (MethodKeys<T>)[] = [],
+    private readonly _stub: Stub<T> = {} as Stub<T>,
+  ) {
+    this._methodNames.forEach((e) => this.initializeStub(e));
   }
   /**
    * Initializes the stub entry for a given method key.
@@ -144,6 +168,7 @@ export class StubFullType<T> implements Stubbed<T> {
    * Simulates the behavior of a method, intercepting calls, saving arguments,
    * incrementing counters, and returning pre-registered outputs.
    *
+   * Errors will be thrown properly.
    * @param args - The arguments passed to the method.
    * @param method - The stubbed method being invoked.
    * @returns The pre-registered output for the stubbed method.

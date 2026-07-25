@@ -21,8 +21,9 @@ export interface Stubbed<T> {
   /**
    * Registers an output for a stubbed method.
    * Each call to the method will return one of the registered outputs in order.
-   * Keys can be marked as permanent, in which case the first output will persist indefinitely.
+   * Methods can be marked as permanent, in which case the first output will persist indefinitely.
    * Once a method is marked as permanent, it will also get ignored by non-true resets.
+   * If an output is an error, the default fakeProcess will throw it properly.
    * @param key - The method key for which the output is registered.
    * @param output - The output to register.
    * @param permanent - Whether the output is permanent.
