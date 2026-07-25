@@ -151,7 +151,7 @@ export class StubFullType<T> implements Stubbed<T> {
   protected fakeProcess(
     args: unknown[],
     method: keyof T,
-  ) {
+  ): unknown {
     this.saveArgs(args, method);
     this.incrementCounter(method);
     const nextOutput = this.nextOutput(method);
