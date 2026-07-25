@@ -1,5 +1,4 @@
-// deno-lint-ignore-file no-import-prefix
-import { assertThrows } from "jsr:@std/assert@1.0.15/throws";
+import { assertThrows } from "@std/assert";
 import { StubFullType } from "../mod.ts";
 import type { FilterAndMapMethodsToUnknown, Stubbed } from "../mod.ts";
 
@@ -61,6 +60,8 @@ Deno.test("StubFullType", async (t) => {
   const testObject: Stubbed<TestType> = StubbedTestTypeWithCreateStatic
       .create(),
     testObject2 = StubbedTest2TypeWithConstructor.create();
+  const newObject = StubFullType._create<TestType4>(["passThrough"]);
+  newObject.overwriteMethod("passThrough");
   await t.step("get stub returns a copy of the stub catalog", () => {
     const stub = testObject.stub;
     assertEquals(stub, testObject.stub);
@@ -143,10 +144,34 @@ Deno.test("StubFullType", async (t) => {
       const data = new DataObject();
       stubbedTestType4.registerOutput("passThrough", data);
       const returned = dependentOnObject(stubbedTestType4.this);
+
       assertEquals(returned, data);
       assertEquals(stubbedTestType4.stub["passThrough"].args[0], [data]);
+      stubbedTestType4.this.passThrough("");
     },
   );
+  await t.step("true reset", () => {
+    const lastTestObject = StubbedTestTypeWithCreateStatic.create(["a", "b"]);
+    assertEquals(lastTestObject.counter("a"), 0);
+    assertNotEquals(lastTestObject.counter("a"), undefined);
+    assertNotEquals(lastTestObject.counter("a"), null);
+    lastTestObject.registerOutput("a", "new output", true);
+    const a = lastTestObject.this.a("test"),
+      b = lastTestObject.this.a("test"),
+      c = lastTestObject.this.a("test");
+    assertEquals(lastTestObject.stub["a"].counter, 3);
+    assertEquals(lastTestObject.stub["a"].args[0], ["test"]);
+    assertEquals(lastTestObject.stub["a"].args[1], ["test"]);
+    assertEquals(a, "new output");
+    assertEquals(b, "new output");
+    assertEquals(c, "new output");
+    lastTestObject.reset();
+    assertEquals(lastTestObject.stub["a"].args[2], ["test"]);
+    assertEquals(lastTestObject.this.a(""), "new output");
+    lastTestObject.reset(true);
+    assertEquals(lastTestObject.this.a(""), undefined);
+  });
+  new StubbedTestType4().overwriteMethod("passThrough");
 });
 function dependentOnObject(testObject: TestType4) {
   const data = new DataObject();

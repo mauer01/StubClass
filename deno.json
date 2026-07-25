@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "@std/assert": "jsr:@std/assert"
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "jsr"
+      ]
+    }
+  }
+}
