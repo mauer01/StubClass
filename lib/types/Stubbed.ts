@@ -1,7 +1,10 @@
 import type { Stub } from "./Stub.ts";
 import type { MethodKeys } from "./MethodKeys.ts";
 
-export interface Stubbed<T> {
+/**
+ * type that represents a stubbed object.
+ */
+export type Stubbed<T> = {
   /**
    * Returns a shallow copy of the stub catalog.
    * Each entry contains arguments, output values, and call counters for individual methods.
@@ -61,4 +64,4 @@ export interface Stubbed<T> {
     key: K,
     fn?: (...args: unknown[]) => unknown,
   ): void;
-}
+};
